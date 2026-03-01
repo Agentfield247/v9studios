@@ -9,17 +9,18 @@ const navItems = [
   { label: "Contact", path: "/contact" },
 ];
 
-// ... (imports remain the same)
-
 const Header = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Helper to close menu when a link is clicked
+  const closeMenu = () => setMobileOpen(false);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-background/80 backdrop-blur-md border-b border-white/5">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
         {/* Logo Section */}
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" onClick={closeMenu} className="flex items-center gap-2">
           <img
             src="/logov9.png"
             alt="V9 Logo"
@@ -29,7 +30,6 @@ const Header = () => {
 
         {/* Desktop nav */}
         <ul className="hidden items-center gap-10 md:flex">
-          {/* ... (navItems mapping remains the same) */}
           {navItems.map((item) => (
             <li key={item.path}>
               <Link
@@ -49,17 +49,46 @@ const Header = () => {
           ))}
         </ul>
 
-        {/* ... (rest of the mobile menu logic remains the same) */}
+        {/* Mobile menu button */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-foreground md:hidden"
+          className="relative z-[110] text-foreground md:hidden p-2 focus:outline-none"
           aria-label="Toggle menu"
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </nav>
 
-      {/* ... (Mobile nav AnimatePresence remains the same) */}
+      {/* Mobile nav Dropdown */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="absolute top-full left-0 w-full overflow-hidden border-t border-white/10 bg-background/95 backdrop-blur-xl md:hidden"
+          >
+            <ul className="flex flex-col gap-2 px-6 py-8">
+              {navItems.map((item) => (
+                <li key={item.path}>
+                  <Link
+                    to={item.path}
+                    onClick={closeMenu}
+                    className={`block rounded-lg px-4 py-4 text-lg font-bold uppercase tracking-widest transition-all ${
+                      location.pathname === item.path
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
